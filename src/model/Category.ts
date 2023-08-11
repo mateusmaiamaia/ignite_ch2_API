@@ -1,0 +1,7 @@
+
+
+class Category {
+
+}
+
+export { Category }
