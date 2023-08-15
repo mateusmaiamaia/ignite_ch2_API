@@ -1,23 +1,30 @@
 import { Router } from "express";
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { v4 as uuidV4 } from "uuid";
+
+import { CategoriesRepository } from "../repositories/Categoriesrepository";
 
 const categoriesRoutes = Router();
-
-const categories = [];
+const categoriesRepository = new CategoriesRepository();
 
 categoriesRoutes.post("/", (request, response) => {
   const { name, description } = request.body;
 
-  const category = {
-    name,
-    description,
-    id: uuidV4(),
-  };
+  const categoryAlredyExists = categoriesRepository.findByName(name);
 
-  categories.push(category);
+  if (categoryAlredyExists) {
+    return response
+      .status(400)
+      .json({ message: "this category alredy exists" });
+  }
+
+  categoriesRepository.create({ name, description });
 
   return response.status(201).send();
+});
+
+categoriesRoutes.get("/", (request, response) => {
+  const all = categoriesRepository.list();
+
+  return response.json(all);
 });
 
 export { categoriesRoutes };
